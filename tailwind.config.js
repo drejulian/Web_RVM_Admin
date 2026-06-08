@@ -15,7 +15,13 @@ module.exports = {
         bgSecondary: '#F2FBFF',
       },
       boxShadow: {
-        'navbar-shadow': '0 ,10px 5.3px rgba(0, 0, 0, 0.25)',
+        'navbar-shadow': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'glow': '0 0 15px rgba(0, 177, 255, 0.3)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },

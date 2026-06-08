@@ -83,127 +83,103 @@ export default function DevicesPage() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Device Management
-        </h1>
-        <div className="flex gap-2">
-          <button
-            onClick={fetchDevices}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
-          >
-            🔄 Refresh
-          </button>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Manajemen Perangkat</h1>
+          <p className="text-sm text-gray-500">Pantau status koneksi dan kesehatan RVM secara real-time</p>
         </div>
+        <button
+          onClick={fetchDevices}
+          className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-all shadow-sm border border-gray-100 flex items-center gap-2 w-fit"
+        >
+          <span>🔄</span>
+          <span>Perbarui Data</span>
+        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Devices</p>
-              <p className="text-3xl font-bold text-gray-800 mt-2">
-                {devices.length}
-              </p>
-            </div>
-            <div className="text-4xl">🔌</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-all">
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Perangkat</p>
+            <p className="text-3xl font-bold text-gray-800">
+              {devices.length}
+            </p>
           </div>
+          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🔌</div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Connected</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">
-                {devices.filter((d) => d.status === 'CONNECTED').length}
-              </p>
-            </div>
-            <div className="text-4xl">✅</div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-all">
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Terhubung</p>
+            <p className="text-3xl font-bold text-green-600">
+              {devices.filter((d) => d.status === 'CONNECTED').length}
+            </p>
           </div>
+          <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">✅</div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Offline</p>
-              <p className="text-3xl font-bold text-red-600 mt-2">
-                {devices.filter((d) => d.status !== 'CONNECTED').length}
-              </p>
-            </div>
-            <div className="text-4xl">❌</div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between group hover:shadow-md transition-all">
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Terputus</p>
+            <p className="text-3xl font-bold text-red-600">
+              {devices.filter((d) => d.status !== 'CONNECTED').length}
+            </p>
           </div>
+          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">❌</div>
         </div>
       </div>
 
       {/* Devices Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Device ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                IP Address
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Ping
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {devices.map((device) => (
-              <tr key={device.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {device.deviceId}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
-                    {device.locationId || '-'}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
-                    {device.ipAddress || '-'}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                      device.status
-                    )}`}
-                  >
-                    {getStatusIcon(device.status)} {device.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatLastPing(device.lastPing)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">
-                    Configure
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    Logs
-                  </button>
-                </td>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-100">
+            <thead className="bg-gray-50/50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Perangkat</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Lokasi ID</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">IP Address</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Ping Terakhir</th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {devices.map((device) => (
+                <tr key={device.id} className="hover:bg-gray-50/50 transition-colors group">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-bold text-gray-800">{device.deviceId}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 font-mono text-xs">{device.locationId || '-'}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 font-mono text-xs">{device.ipAddress || '-'}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span
+                      className={`px-3 py-1 inline-flex text-[10px] font-bold rounded-full shadow-sm ${getStatusColor(
+                        device.status
+                      )}`}
+                    >
+                      {getStatusIcon(device.status)} <span className="ml-1">{device.status}</span>
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatLastPing(device.lastPing)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex justify-end gap-2">
+                      <button className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">⚙️</button>
+                      <button className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors">📋</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {devices.length === 0 && (

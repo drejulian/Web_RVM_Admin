@@ -317,16 +317,18 @@ export default function LocationsPage() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          RVM Locations Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Manajemen Lokasi RVM</h1>
+          <p className="text-sm text-gray-500">Pantau status dan kapasitas di semua titik pemasangan</p>
+        </div>
         <button 
           onClick={handleAddNew}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+          className="px-6 py-3 bg-primary hover:bg-primary-600 text-white font-bold rounded-xl transition-all shadow-md shadow-primary/20 flex items-center gap-2 w-fit"
         >
-          Add New Location
+          <span>➕</span>
+          <span>Tambah Lokasi Baru</span>
         </button>
       </div>
 
@@ -334,91 +336,118 @@ export default function LocationsPage() {
         {locations.map((location) => (
           <div
             key={location.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
           >
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-bold text-gray-800">
-                {location.name}
-              </h3>
-              <span
-                className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                  location.status
-                )}`}
-              >
-                {location.status}
-              </span>
-            </div>
-
-            {location.image && (() => {
-              try {
-                const images = JSON.parse(location.image)
-                return images.length > 0 ? (
-                  <div className="-mx-6 -mt-6 -mb-2 relative">
-                    <img
-                      src={images[0]}
-                      alt={location.name}
-                      className="w-full h-40 object-cover rounded-t-lg"
-                    />
-                    {images.length > 1 && (
-                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-                        +{images.length - 1} foto
-                      </div>
-                    )}
-                  </div>
-                ) : null
-              } catch {
-                return null
-              }
-            })()}
-
-            <p className="text-sm text-gray-600 mb-4">
-              {location.address || 'No address'}
-            </p>
-
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Capacity:</span>
-                <span className="font-medium">
-                  {location.currentStock} / {location.capacity}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Status:</span>
+            <div className="relative">
+              {location.image ? (() => {
+                try {
+                  const images = JSON.parse(location.image)
+                  return images.length > 0 ? (
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={images[0]}
+                        alt={location.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      {images.length > 1 && (
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-lg text-[10px] font-bold shadow-sm">
+                          +{images.length - 1} FOTO
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
+                      <span className="text-4xl">📍</span>
+                    </div>
+                  )
+                } catch {
+                  return (
+                    <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
+                      <span className="text-4xl">📍</span>
+                    </div>
+                  )
+                }
+              })() : (
+                <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span className="text-4xl">📍</span>
+                </div>
+              )}
+              <div className="absolute top-3 left-3">
                 <span
-                  className={`px-2 py-1 rounded text-xs font-medium ${getCapacityColor(
-                    location.capacityStatus
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold shadow-sm backdrop-blur-md ${getStatusColor(
+                    location.status
                   )}`}
                 >
-                  {location.capacityStatus}
+                  {location.status}
                 </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-600">Hours:</span>
-                <span className="font-medium">{location.operationalHours}</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t flex gap-2">
-              <button 
-                onClick={() => handleEdit(location)}
-                className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => handleView(location)}
-                className="flex-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm transition"
-              >
-                View Details
-              </button>
-              <button 
-                onClick={() => handleDeleteClick(location)}
-                className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition"
-              >
-                Delete
-              </button>
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors">
+                {location.name}
+              </h3>
+              
+              <div className="flex items-start gap-2 mb-4">
+                <span className="text-gray-400 mt-0.5">📍</span>
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  {location.address || 'Alamat tidak tersedia'}
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <div className="flex justify-between text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">
+                    <span>Kapasitas</span>
+                    <span>{location.currentStock} / {location.capacity} Botol</span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-500 ${
+                        (location.currentStock / location.capacity) > 0.8 ? 'bg-red-500' : 
+                        (location.currentStock / location.capacity) > 0.5 ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
+                      style={{ width: `${Math.min((location.currentStock / location.capacity) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between py-2 border-y border-gray-50">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🕒</span>
+                    <span className="text-xs text-gray-600 font-medium">{location.operationalHours}</span>
+                  </div>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${getCapacityColor(
+                      location.capacityStatus
+                    )}`}
+                  >
+                    {location.capacityStatus}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-auto">
+                <button 
+                  onClick={() => handleEdit(location)}
+                  className="flex-1 px-3 py-2.5 bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 rounded-xl text-xs font-bold transition-all border border-gray-100 hover:border-blue-100"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => handleView(location)}
+                  className="flex-1 px-3 py-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl text-xs font-bold transition-all"
+                >
+                  Detail
+                </button>
+                <button 
+                  onClick={() => handleDeleteClick(location)}
+                  className="p-2.5 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white rounded-xl text-xs transition-all border border-red-100"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           </div>
         ))}

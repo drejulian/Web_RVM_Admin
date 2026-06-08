@@ -229,16 +229,18 @@ export default function NewsPage() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          News Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Manajemen Berita</h1>
+          <p className="text-sm text-gray-500">Kelola konten berita dan informasi untuk pengguna</p>
+        </div>
         <button 
           onClick={handleAddNew}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+          className="px-6 py-3 bg-primary hover:bg-primary-600 text-white font-bold rounded-xl transition-all shadow-md shadow-primary/20 flex items-center gap-2 w-fit"
         >
-          Add News
+          <span>➕</span>
+          <span>Tambah Berita</span>
         </button>
       </div>
 
@@ -246,53 +248,57 @@ export default function NewsPage() {
         {newsList.map((news) => (
           <div
             key={news.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition flex flex-col"
+            className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
           >
-          {news.image && (
-              <div className="-mx-6 -mt-6 relative mb-4">
-                <img
-                  src={news.image}
-                  alt={news.title}
-                  className="w-full h-40 object-cover rounded-t-lg"
-                />
-              </div>
-            )}
-
-            {!news.image && news.imageUrl && (
-              <div className="-mx-6 -mt-6 relative mb-4">
-                <img
-                  src={news.imageUrl}
-                  alt={news.title}
-                  className="w-full h-40 object-cover rounded-t-lg"
-                />
-              </div>
-            )}
-
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
-              {news.title}
-            </h3>
-
-            <p className="text-sm text-gray-600 mb-4 grow line-clamp-3">
-              {news.content}
-            </p>
-
-            <div className="text-xs text-gray-500 mb-4">
-              {new Date(news.createdAt).toLocaleDateString('id-ID')}
+            <div className="relative">
+              {(news.image || news.imageUrl) ? (
+                <div className="relative h-48 overflow-hidden bg-gray-100">
+                  <img
+                    src={news.image || news.imageUrl || ''}
+                    alt={news.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+              ) : (
+                <div className="h-48 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                  <span className="text-5xl">📰</span>
+                </div>
+              )}
             </div>
 
-            <div className="flex gap-2">
-              <button 
-                onClick={() => handleEdit(news)}
-                className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => handleDeleteClick(news)}
-                className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition"
-              >
-                Delete
-              </button>
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="text-lg font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                {news.title}
+              </h3>
+
+              <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">
+                {news.content}
+              </p>
+
+              <div className="flex items-center gap-2 text-xs text-gray-400 mb-4 pb-4 border-b border-gray-100">
+                <span>📅</span>
+                <span className="font-medium">{new Date(news.createdAt).toLocaleDateString('id-ID', { 
+                  day: 'numeric', 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}</span>
+              </div>
+
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleEdit(news)}
+                  className="flex-1 px-3 py-2.5 bg-blue-50 hover:bg-blue-500 text-blue-600 hover:text-white rounded-xl text-xs font-bold transition-all"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => handleDeleteClick(news)}
+                  className="px-3 py-2.5 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-xl text-xs font-bold transition-all"
+                >
+                  Hapus
+                </button>
+              </div>
             </div>
           </div>
         ))}

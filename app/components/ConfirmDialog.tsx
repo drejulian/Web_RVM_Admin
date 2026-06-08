@@ -35,22 +35,19 @@ export default function ConfirmDialog({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
-      {/* Backdrop with blur */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       
-      {/* Dialog Content */}
       <div
-        className="relative bg-white rounded-xl shadow-2xl max-w-md w-full transform transition-all"
+        className="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full transform transition-all animate-in zoom-in-95 duration-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          {/* Icon */}
-          <div className={`flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full ${iconColors[icon]}`}>
+        <div className="p-8">
+          <div className={`flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-2xl ${iconColors[icon]} shadow-sm`}>
             <svg
-              className="w-6 h-6"
+              className="w-8 h-8"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -64,25 +61,22 @@ export default function ConfirmDialog({
             </svg>
           </div>
 
-          {/* Title */}
-          <h3 className="text-xl font-bold text-center text-gray-800 mb-2">
+          <h3 className="text-xl font-bold text-center text-gray-800 mb-3">
             {title}
           </h3>
 
-          {/* Message */}
-          <p className="text-center text-gray-600 mb-6" dangerouslySetInnerHTML={{ __html: message }} />
+          <p className="text-center text-gray-500 text-sm mb-8 leading-relaxed" dangerouslySetInnerHTML={{ __html: message }} />
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition"
+              className="flex-1 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold rounded-xl transition-all text-sm"
             >
               {cancelText}
             </button>
             <button
               onClick={handleConfirm}
-              className={`flex-1 px-4 py-2 text-white font-medium rounded-lg transition ${confirmButtonClass}`}
+              className={`flex-1 px-4 py-3 text-white font-bold rounded-xl transition-all text-sm shadow-md ${confirmButtonClass}`}
             >
               {confirmText}
             </button>
