@@ -3,69 +3,84 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// User Model (existing dari user app)
 model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
-  createdAt   DateTime         @default(now())
+  id          String   @id @default(uuid())
+  email       String   @unique
+  createdAt   DateTime @default(now())
   nama        String?
   password    String?
-  phoneNumber String?          @map("phone_number")
-  updatedAt   DateTime         @updatedAt
-  
+  phoneNumber String?  @map("phone_number")
+  updatedAt   DateTime @updatedAt
+
   // Google Authentication
-  googleId    String?          @unique
-  isGoogleAuth Boolean         @default(false)
-  
+  googleId     String? @unique
+  isGoogleAuth Boolean @default(false)
+
+  // Password Reset fields
+  resetPasswordToken       String?
+  resetPasswordTokenExpiry DateTime?
+
   bottleCount UserBottleCount?
+  redemptions VoucherRedemption[]
+  arduinoSessions ArduinoSession[]
 }
 
 model UserBottleCount {
-  id                String              @id @default(uuid())
-  userId            String              @unique
-  totalBottles      Int                 @default(0)
-  redeemableCount   Int                 @default(0)
-  lifetimeCount     Int                 @default(0)
-  points            Int                 @default(0)
-  lifetimePoints    Int                 @default(0)
-  lastUpdated       DateTime            @default(now()) @updatedAt
-  
-  bottleCounts      BottleCount[] 
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  totalBottles    Int      @default(0)
+  redeemableCount Int      @default(0)
+  lifetimeCount   Int      @default(0)
+  points          Int      @default(0)
+  lifetimePoints  Int      @default(0)
+  lastUpdated     DateTime @default(now()) @updatedAt
+
+  bottleCounts       BottleCount[]
   bottleTransactions BottleTransaction[]
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_bottle_counts")
 }
 
 model BottleTransaction {
-  id                String                @id @default(uuid())
+  id                String   @id @default(uuid())
   userBottleCountId String
-  bottleCountId     Int?
   deviceId          String?
+  locationId        Int?
   transactionType   String
   bottleCount       Int
-  pointsEarned      Int                   @default(0)
-  timestamp         DateTime              @default(now())
-  
-  userBottleCount   UserBottleCount       @relation(fields: [userBottleCountId], references: [id], onDelete: Cascade)
+  pointsEarned      Int      @default(0)
+  timestamp         DateTime @default(now())
+
+  userBottleCount UserBottleCount    @relation(fields: [userBottleCountId], references: [id], onDelete: Cascade)
+  device          ArduinoConnection? @relation(fields: [deviceId], references: [deviceId], onDelete: SetNull)
+  location        RvmLocation?       @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  bottleCounts    BottleCount[]
 
   @@map("bottle_transactions")
 }
 
 model ArduinoConnection {
-  id          Int      @id @default(autoincrement())
-  deviceId    String
-  locationId  Int?
-  ipAddress   String?
-  status      String
-  lastPing    DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  deviceId   String   @unique
+  locationId Int?
+  ipAddress  String?
+  status     String
+  lastPing   DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  location     RvmLocation?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  transactions BottleTransaction[]
+  bottleCounts BottleCount[]
+  sessions     ArduinoSession[]
+
+  @@map("arduino_connections")
 }
 
 model RvmLocation {
@@ -80,23 +95,30 @@ model RvmLocation {
   contactNumber    String?
   status           String   @default("ACTIVE")
   image            String?
-  images           Json?    // JSON array of image objects: [{url, publicId}, ...]
+  images           Json?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  arduinoConnections ArduinoConnection[]
+  transactions       BottleTransaction[]
 
   @@map("rvm_locations")
 }
 
 model BottleCount {
-  id                 Int              @id @default(autoincrement())
-  deviceId           String
-  count              Int              @default(1)
-  distance           Float?
-  source             String           @default("arduino")
-  timestamp          DateTime         @default(now())
-  userBottleCountId  String?          
-  userBottleCount    UserBottleCount? @relation(fields: [userBottleCountId], references: [id], onDelete: Cascade)
-  
+  id                  Int      @id @default(autoincrement())
+  deviceId            String
+  count               Int      @default(1)
+  distance            Float?
+  source              String   @default("arduino")
+  timestamp           DateTime @default(now())
+  userBottleCountId   String?
+  bottleTransactionId String?
+
+  userBottleCount UserBottleCount?   @relation(fields: [userBottleCountId], references: [id], onDelete: Cascade)
+  device          ArduinoConnection  @relation(fields: [deviceId], references: [deviceId], onDelete: Cascade)
+  transaction     BottleTransaction? @relation(fields: [bottleTransactionId], references: [id], onDelete: SetNull)
+
   @@map("bottle_counts")
 }
 
@@ -109,18 +131,18 @@ enum BottleTransactionType {
 // ===== ADMIN MODELS =====
 
 model Admin {
-  id          String      @id @default(uuid())
-  email       String      @unique
-  nama        String
-  password    String
-  role        AdminRole   @default(OPERATOR)
-  isActive    Boolean     @default(true)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  lastLogin   DateTime?
-  
-  auditLogs   AuditLog[]
-  
+  id        String    @id @default(uuid())
+  email     String    @unique
+  nama      String
+  password  String
+  role      AdminRole @default(OPERATOR)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lastLogin DateTime?
+
+  auditLogs AuditLog[]
+
   @@map("admins")
 }
 
@@ -132,17 +154,17 @@ enum AdminRole {
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
-  adminId     String
-  action      String
-  targetType  String
-  targetId    String?
-  details     Json?
-  ipAddress   String?
-  timestamp   DateTime @default(now())
-  
-  admin       Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String?
+  details    Json?
+  ipAddress  String?
+  timestamp  DateTime @default(now())
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
   @@map("audit_logs")
 }
 
@@ -157,37 +179,38 @@ model News {
   createdBy   String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  
+
   @@map("news")
 }
 
 model Voucher {
-  id            String              @id @default(uuid())
-  code          String              @unique
-  partner       String
-  value         Int
-  pointCost     Int
-  stock         Int                 @default(0)
-  isActive      Boolean             @default(true)
-  expiryDate    DateTime?
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
-  
-  redemptions   VoucherRedemption[]
-  
+  id         String    @id @default(uuid())
+  code       String    @unique
+  partner    String
+  value      Int
+  pointCost  Int
+  stock      Int       @default(0)
+  isActive   Boolean   @default(true)
+  expiryDate DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  redemptions VoucherRedemption[]
+
   @@map("vouchers")
 }
 
 model VoucherRedemption {
-  id          String   @id @default(uuid())
-  voucherId   String
-  userId      String
-  status      String
-  redeemedAt  DateTime @default(now())
-  usedAt      DateTime?
-  
-  voucher     Voucher  @relation(fields: [voucherId], references: [id], onDelete: Cascade)
-  
+  id         String    @id @default(uuid())
+  voucherId  String
+  userId     String
+  status     String
+  redeemedAt DateTime  @default(now())
+  usedAt     DateTime?
+
+  voucher Voucher @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("voucher_redemptions")
 }
 
@@ -197,6 +220,22 @@ model SystemConfig {
   value       String
   description String?
   updatedAt   DateTime @updatedAt
-  
+
   @@map("system_configs")
+}
+
+model ArduinoSession {
+  id          String    @id @default(uuid())
+  deviceId    String   
+  userId      String   
+  expiresAt   DateTime
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+  
+  device ArduinoConnection @relation(fields: [deviceId], references: [deviceId], onDelete: Cascade)
+  user   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([deviceId, isActive])
+  @@map("arduino_sessions")
 }

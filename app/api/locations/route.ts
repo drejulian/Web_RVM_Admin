@@ -73,10 +73,29 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Auto-create ArduinoConnection with deviceId based on location name
+    const cleanName = name
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toUpperCase()
+    
+    const deviceId = `RVM-${cleanName}`
+
+    const arduinoConnection = await prisma.arduinoConnection.create({
+      data: {
+        deviceId,
+        locationId: location.id,
+        status: 'OFFLINE',
+        ipAddress: null,
+      },
+    })
+
     return NextResponse.json(
       { 
         success: true, 
         location,
+        deviceId: arduinoConnection.deviceId,
         message: 'Lokasi berhasil ditambahkan'
       },
       { status: 201 }
